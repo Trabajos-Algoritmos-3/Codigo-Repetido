@@ -1,4 +1,4 @@
-# Codigo-Repetido
+# Codigo Repetido
 
 Este ejercicio tiene por objetivo que saquen el código repetido que encuentren en el modelo y en los tests. Por ej. entre el test01 y test02.
 
