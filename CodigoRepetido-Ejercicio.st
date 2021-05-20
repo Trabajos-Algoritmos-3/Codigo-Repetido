@@ -21,20 +21,20 @@ TestCase subclass: #CustomerBookTest
 	poolDictionaries: ''
 	category: 'CodigoRepetido-Ejercicio'!
 
-!CustomerBookTest methodsFor: 'funciones-para-test' stamp: 'fran 5/18/2021 15:21:06'!
-BerificarQue: AClusure siFalla: ErrorQueOcurrio ejecutar: AnotherClosure
-	AClusure
+!CustomerBookTest methodsFor: 'funciones-para-test' stamp: 'fj 5/19/2021 22:29:56'!
+BerificarQue: BloqueDeCodigoEnEjecucion siOcurreElError: ErrorQueOcurrio ejecutar: BloqueDeCodigoSiHayError
+	BloqueDeCodigoEnEjecucion
 	on: ErrorQueOcurrio 
-	do: AnotherClosure.! !
+	do: BloqueDeCodigoSiHayError.! !
 
 !CustomerBookTest methodsFor: 'funciones-para-test' stamp: 'fran 5/16/2021 22:11:26'!
 agregarYSuspenderAlCliente: Cliente ACustomerBook: customerBook
 	customerBook addCustomerNamed: Cliente .
 	customerBook suspendCustomerNamed: Cliente.! !
 
-!CustomerBookTest methodsFor: 'funciones-para-test' stamp: 'fran 5/18/2021 21:18:07'!
-calcularElTiempoEnMilisegundos: unBloqueDeCodigo
-	^unBloqueDeCodigo timeToRun.	! !
+!CustomerBookTest methodsFor: 'funciones-para-test' stamp: 'fj 5/19/2021 22:30:39'!
+calcularElTiempoEnMilisegundos: BloqueDeCodigoACalcularTiempoDeEjecucion
+	^BloqueDeCodigoACalcularTiempoDeEjecucion timeToRun.	! !
 
 !CustomerBookTest methodsFor: 'funciones-para-test' stamp: 'fran 5/18/2021 14:29:18'!
 crearCustomerBook
@@ -56,10 +56,14 @@ crearCustomerBookYAgregarUsuarioYSuspenderUsuarioYDevolverSuNombre
 	libroDeClientes suspendCustomerNamed: usuarioAgregadoAlLibroDeClientes.
 	^usuarioAgregadoAlLibroDeClientes.! !
 
-!CustomerBookTest methodsFor: 'funciones-para-test' stamp: 'fran 5/18/2021 14:00:46'!
+!CustomerBookTest methodsFor: 'funciones-para-test' stamp: 'fj 5/19/2021 22:15:08'!
 testearQue: tiempoDeEjecucion esMenorA: tiempoEsperadoDeEjecucion
-	 ^(tiempoDeEjecucion ) < (tiempoEsperadoDeEjecucion).
+	 ^self assert: ((tiempoDeEjecucion ) < (tiempoEsperadoDeEjecucion)).
 	! !
+
+!CustomerBookTest methodsFor: 'funciones-para-test' stamp: 'fj 5/19/2021 22:20:03'!
+testearQueElLibroDeClientesIncluyeAlNombre: nombreDelCliente
+	^self assert: (libroDeClientes includesCustomerNamed: nombreDelCliente) .! !
 
 !CustomerBookTest methodsFor: 'funciones-para-test' stamp: 'fran 5/18/2021 15:12:29'!
 testearQueLaCantidadDeClientesActivosEs: cantidadDeClientesActivos yLaCantidadDeClientesSuspendidosEs: cantidadDeClientesSuspendidos yLaCantidadDeClientesEs: cantidadDeClientes.
@@ -68,21 +72,17 @@ testearQueLaCantidadDeClientesActivosEs: cantidadDeClientesActivos yLaCantidadDe
 	self assert: cantidadDeClientes equals: libroDeClientes numberOfCustomers.
 	! !
 
-!CustomerBookTest methodsFor: 'funciones-para-test' stamp: 'fran 5/16/2021 21:28:15'!
-tiempoActualEnMilisegundos
-	^Time millisecondClockValue * millisecond.! !
 
-
-!CustomerBookTest methodsFor: 'tests' stamp: 'fran 5/18/2021 21:18:29'!
+!CustomerBookTest methodsFor: 'tests' stamp: 'fj 5/19/2021 22:15:20'!
 test01AddingCustomerShouldNotTakeMoreThan50Milliseconds
 
 	|  tiempoDeEjecucion |
 
 	tiempoDeEjecucion := self calcularElTiempoEnMilisegundos: [ self crearCustomerBookYAgregarUsuarioYDevolverSuNombre ].
 	
-	self assert: (self testearQue: tiempoDeEjecucion  esMenorA: (50 * millisecond )).! !
+	self testearQue: tiempoDeEjecucion  esMenorA: (50 * millisecond ).! !
 
-!CustomerBookTest methodsFor: 'tests' stamp: 'fran 5/18/2021 21:19:05'!
+!CustomerBookTest methodsFor: 'tests' stamp: 'fj 5/19/2021 22:14:24'!
 test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 
 	| nombreDelClienteABorrar tiempoDeEjecucion |
@@ -91,23 +91,23 @@ test02RemovingCustomerShouldNotTakeMoreThan100Milliseconds
 	 
 	tiempoDeEjecucion := self calcularElTiempoEnMilisegundos: [libroDeClientes removeCustomerNamed: nombreDelClienteABorrar ].
 	
-	self assert: (self testearQue: tiempoDeEjecucion  esMenorA: (100 * millisecond )).
+	self testearQue: tiempoDeEjecucion  esMenorA: (100 * millisecond ).
 	
 ! !
 
-!CustomerBookTest methodsFor: 'tests' stamp: 'fran 5/18/2021 21:15:57'!
+!CustomerBookTest methodsFor: 'tests' stamp: 'fj 5/19/2021 22:27:06'!
 test03CanNotAddACustomerWithEmptyName 
 
 	self crearCustomerBook.
 	
 	
 	self BerificarQue: [libroDeClientes addCustomerNamed: ''. self fail] 
-		siFalla: Error
+		siOcurreElError: Error
 		ejecutar: [ :anError | 
 			self assert: anError messageText = CustomerBook customerCanNotBeEmptyErrorMessage.
 			self assert: libroDeClientes isEmpty ].! !
 
-!CustomerBookTest methodsFor: 'tests' stamp: 'fran 5/18/2021 21:19:19'!
+!CustomerBookTest methodsFor: 'tests' stamp: 'fj 5/19/2021 22:27:11'!
 test04CanNotRemoveAnInvalidCustomer
 	
 	| clienteAgregadoAlLibroDeClientes |
@@ -115,12 +115,12 @@ test04CanNotRemoveAnInvalidCustomer
 	clienteAgregadoAlLibroDeClientes := self crearCustomerBookYAgregarUsuarioYDevolverSuNombre.
 	
 	self BerificarQue: [ libroDeClientes removeCustomerNamed: 'Paul McCartney'. self fail ] 
-		siFalla: NotFound 
+		siOcurreElError: NotFound 
 		ejecutar: [ :anError | 
 			self assert: libroDeClientes numberOfCustomers = 1.
 			self assert: (libroDeClientes includesCustomerNamed: clienteAgregadoAlLibroDeClientes) ]! !
 
-!CustomerBookTest methodsFor: 'tests' stamp: 'fran 5/18/2021 15:12:46'!
+!CustomerBookTest methodsFor: 'tests' stamp: 'fj 5/19/2021 22:21:51'!
 test05SuspendingACustomerShouldNotRemoveItFromCustomerBook
 	
 	| usuarioASuspenderDelLibroDeClientes |
@@ -128,7 +128,7 @@ test05SuspendingACustomerShouldNotRemoveItFromCustomerBook
 	usuarioASuspenderDelLibroDeClientes := self crearCustomerBookYAgregarUsuarioYSuspenderUsuarioYDevolverSuNombre.
 	
 	self testearQueLaCantidadDeClientesActivosEs: 0 yLaCantidadDeClientesSuspendidosEs: 1 yLaCantidadDeClientesEs: 1.
-	self assert: (libroDeClientes includesCustomerNamed: usuarioASuspenderDelLibroDeClientes).
+	self testearQueElLibroDeClientesIncluyeAlNombre: usuarioASuspenderDelLibroDeClientes.
 	
 
 	
@@ -149,7 +149,7 @@ test06RemovingASuspendedCustomerShouldRemoveItFromCustomerBook
 	
 ! !
 
-!CustomerBookTest methodsFor: 'tests' stamp: 'fran 5/18/2021 21:13:20'!
+!CustomerBookTest methodsFor: 'tests' stamp: 'fj 5/19/2021 22:27:15'!
 test07CanNotSuspendAnInvalidCustomer
 	
 	| usuarioAgregadoAlLibroDeClientes |
@@ -157,13 +157,13 @@ test07CanNotSuspendAnInvalidCustomer
 	usuarioAgregadoAlLibroDeClientes := self crearCustomerBookYAgregarUsuarioYDevolverSuNombre.
 	
 	self BerificarQue: [ libroDeClientes suspendCustomerNamed: 'Ringo Starr'. self fail ] 
-		siFalla: CantSuspend
+		siOcurreElError: CantSuspend
 		ejecutar: [ :anError | 
 				self assert: libroDeClientes numberOfCustomers = 1.
-				self assert: (libroDeClientes includesCustomerNamed: usuarioAgregadoAlLibroDeClientes) ]
+				self testearQueElLibroDeClientesIncluyeAlNombre: usuarioAgregadoAlLibroDeClientes]
 ! !
 
-!CustomerBookTest methodsFor: 'tests' stamp: 'fran 5/18/2021 21:14:24'!
+!CustomerBookTest methodsFor: 'tests' stamp: 'fj 5/19/2021 22:25:52'!
 test08CanNotSuspendAnAlreadySuspendedCustomer
 	
 	| usuarioaAgregadoYSuspendidoDelLibroDeClientes |
@@ -171,10 +171,10 @@ test08CanNotSuspendAnAlreadySuspendedCustomer
 	usuarioaAgregadoYSuspendidoDelLibroDeClientes := self crearCustomerBookYAgregarUsuarioYSuspenderUsuarioYDevolverSuNombre.
 	
 	self BerificarQue: [ libroDeClientes suspendCustomerNamed: usuarioaAgregadoYSuspendidoDelLibroDeClientes. self fail ] 
-		siFalla: CantSuspend
+		siOcurreElError: CantSuspend
 		ejecutar: [ :anError | 
 				self assert: libroDeClientes numberOfCustomers = 1.
-				self assert: (libroDeClientes includesCustomerNamed: usuarioaAgregadoYSuspendidoDelLibroDeClientes) ]! !
+				self testearQueElLibroDeClientesIncluyeAlNombre: usuarioaAgregadoYSuspendidoDelLibroDeClientes]! !
 
 
 !classDefinition: #CustomerBook category: 'CodigoRepetido-Ejercicio'!
